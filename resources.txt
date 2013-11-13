@@ -1,3 +1,0 @@
-#include </System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/CGWindow.h>
-
-http://stackoverflow.com/questions/2919629/mac-os-x-linker-error-in-qt-coregraphics-cgwindowlistcreate

@@ -5,7 +5,6 @@
 #include <QScreen>
 #include <QApplication>
 #include <QDesktopWidget>
-//#include <QxtGui/QxtWindowSystem>
 #include <QStackedWidget>
 #include <QMouseEvent>
 #include "preferences.h"
