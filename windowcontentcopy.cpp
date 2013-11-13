@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QPixmap>
 #include <QDebug>
-#include <QxtGui/QxtWindowSystem>
+#include "windowutils.h"
 WindowContentCopy::WindowContentCopy(QWidget *parent) :
     QWidget(parent), m_hasWindow(false)
 {
@@ -29,7 +29,7 @@ void WindowContentCopy::paintEvent(QPaintEvent *event)
 void WindowContentCopy::checkTargetWindow()
 {
     if (!m_hasWindow) return;
-    if (QxtWindowSystem::windowGeometry(targetWindow()).isNull()) {
+    if (!WindowUtils::isValid(targetWindow())) {
         m_hasWindow = false;
         window()->setWindowTitle("window-copy");
     }
@@ -38,7 +38,7 @@ void WindowContentCopy::checkTargetWindow()
 void WindowContentCopy::copyTitle()
 {
     window()->setWindowTitle(
-                QxtWindowSystem::windowTitle(targetWindow()) + "#");
+                WindowUtils::windowTitle(targetWindow()) + "#");
 }
 
 // todo add signal to be sent when target window closes
@@ -48,8 +48,8 @@ void WindowContentCopy::update()
     checkTargetWindow();
     if (!m_hasWindow) return;
     QWidget::update();
-    qDebug() << QxtWindowSystem::windowGeometry(targetWindow()).size();
-    window()->resize(QxtWindowSystem::windowGeometry(targetWindow()).size());
+    qDebug() << WindowUtils::windowGeometry(targetWindow()).size();
+    window()->resize(WindowUtils::windowGeometry(targetWindow()).size());
     copyTitle();
 }
 

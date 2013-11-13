@@ -1,6 +1,6 @@
 #include "preferences.h"
 #include "ui_preferences.h"
-#include <QxtGui/QxtWindowSystem>
+#include "windowutils.h"
 Preferences::Preferences(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Preferences)
@@ -23,8 +23,8 @@ void Preferences::updateSelected(int index)
 
 void Preferences::populateLists()
 {
-    foreach (WId i, QxtWindowSystem::windows()) {
+    foreach (WId i, WindowUtils::windows()) {
         widList << i;
-        titleList << QxtWindowSystem::windowTitle(i);
+        titleList << WindowUtils::windowTitle(i);
     }
 }

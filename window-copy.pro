@@ -16,15 +16,19 @@ TEMPLATE = app
 SOURCES += main.cpp\
         dialog.cpp \
     preferences.cpp \
-    windowcontentcopy.cpp
+    windowcontentcopy.cpp \
+    windowutils.cpp
 
 HEADERS  += dialog.h \
     preferences.h \
-    windowcontentcopy.h
+    windowcontentcopy.h \
+    windowutils.h
 
 FORMS    += dialog.ui \
     preferences.ui \
     windowcontentcopy.ui
+
+mac:LIBS += -framework ApplicationServices
 
 #INCLUDEPATH += /usr/include/qxt
 #LIBS +
