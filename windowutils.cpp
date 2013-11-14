@@ -1,8 +1,4 @@
 #include "windowutils.h"
-bool WindowUtils::isValid(WId id)
-{
-    return !windowGeometry(id).isNull();
-}
 #if defined(__linux__)
 #include <QxtGui/QxtWindowSystem>
 #include <QList>
@@ -18,10 +14,15 @@ QRect WindowUtils::windowGeometry(WId id)
 {
     return QxtWindowSystem::windowGeometry(id);
 }
+bool WindowUtils::isValid(WId id)
+{
+    return !windowGeometry(id).isNull();
+}
 #elif defined(__APPLE__)
 /* Resources:
  *  http://stackoverflow.com/questions/2919629/mac-os-x-linker-error-in-qt-coregraphics-cgwindowlistcreate
  *  https://developer.apple.com/library/mac/documentation/corefoundation/Reference/CFArrayRef/Reference/reference.html#//apple_ref/c/func/CFArrayGetTypeID
+ *  http://stackoverflow.com/questions/14666123/take-screenshot-without-window
  * CF = CoreFoundation
  * CG = CoreGraphics -> Quartz
 */
@@ -58,11 +59,11 @@ QList<WId> WindowUtils::windows()
         }
     */
     QList<WId> result;
-    CFArrayRef array = CGWindowListCreate(kCGWindowListOptionAll, kCGNullWindowID);
+    CFArrayRef array = CGWindowListCreate(kCGWindowListOptionAll | kCGWindowListExcludeDesktopElements | kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
     //qDebug() << "Found " << CFArrayGetCount(array) << " windows";
     for (int i = 0; i < CFArrayGetCount(array); i++) {
         // what type is this?
-        result << (CGWindowID) CFArrayGetValueAtIndex(array, i);
+        result << (CGWindowID) (uintptr_t) CFArrayGetValueAtIndex(array, i);
     }
     CFRelease(array);
     return result;
@@ -75,8 +76,10 @@ QString WindowUtils::windowTitle(WId id)
     //CFArrayRef infoArray = CGWindowListCreateDescriptionFromArray
     CFArrayRef windows = createWindowDescription(id);
     CFDictionaryRef window = (CFDictionaryRef) CFArrayGetValueAtIndex(windows, 0);
-    CFStringRef titleRef = CFDictionaryGetValue(window, kCGWindowOwnerName);
-    QString result = titleRef ? toQString(titleRef) : "Unknown application name";
+    CFStringRef nameRef = (CFStringRef) CFDictionaryGetValue(window, kCGWindowName);
+    if (!nameRef) nameRef = (CFStringRef) CFDictionaryGetValue(window, kCGWindowOwnerName);
+    QString result = toQString(nameRef);
+    if (result.isEmpty()) result = QString::number(id);
     CFRelease(windows);
     return result;
 }
@@ -97,10 +100,10 @@ QRect WindowUtils::windowGeometry(WId id)
     CFArrayRef idArray = CFArrayCreate(NULL, (const void **) idCArray, 1, NULL);
     CFArrayRef descArray = CGWindowListCreateDescriptionFromArray(idArray);
     CFDictionaryRef description = (CFDictionaryRef) CFArrayGetValueAtIndex(descArray, 0);
-    if (CFDescriptionContainsKey(description, kCGWindowBounds)) { // always true?
-        CFDectionaryRef bounds = (CFDictionaryRef) CFDictionaryGetValue(description, kCGWindowBounds);
+    if (CFDictionaryContainsKey(description, kCGWindowBounds)) { // always true?
+        CFDictionaryRef bounds = (CFDictionaryRef) CFDictionaryGetValue(description, kCGWindowBounds);
         if (bounds) {
-            CGRectMakeWithDectionaryRepresentation(bounds, &rect);
+            CGRectMakeWithDictionaryRepresentation(bounds, &rect);
         }
     }
     QRect result(CGRectGetMinX(rect), CGRectGetMinY(rect),
