@@ -4,6 +4,8 @@
 #include <QTimer>
 #include <QPixmap>
 #include <QDebug>
+#include <QApplication>
+#include <QDesktopWidget>
 #include "windowutils.h"
 WindowContentCopy::WindowContentCopy(QWidget *parent) :
     QWidget(parent), m_hasWindow(false)
@@ -21,7 +23,8 @@ void WindowContentCopy::paintEvent(QPaintEvent *event)
         return;
     }
     QPainter painter(this);
-    QPixmap windowPixmap = QPixmap::grabWindow(targetWindow());
+    QPixmap windowPixmap = WindowUtils::grabWindow(targetWindow());
+    qDebug() << windowPixmap.size() << "for target window" << targetWindow();
     painter.drawPixmap(QPoint(), windowPixmap);
     event->accept();
 }
@@ -48,7 +51,7 @@ void WindowContentCopy::update()
     checkTargetWindow();
     if (!m_hasWindow) return;
     QWidget::update();
-    qDebug() << WindowUtils::windowGeometry(targetWindow()).size();
+    //qDebug() << WindowUtils::windowGeometry(targetWindow()).size();
     window()->resize(WindowUtils::windowGeometry(targetWindow()).size());
     copyTitle();
 }

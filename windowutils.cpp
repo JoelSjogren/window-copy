@@ -2,6 +2,7 @@
 #if defined(__linux__)
 #include <QxtGui/QxtWindowSystem>
 #include <QList>
+#include <QPixmap>
 QList<WId> WindowUtils::windows()
 {
     return QxtWindowSystem::windows();
@@ -18,6 +19,10 @@ bool WindowUtils::isValid(WId id)
 {
     return !windowGeometry(id).isNull();
 }
+QPixmap WindowUtils::grabWindow(WId id)
+{
+    return QPixmap::grabWindow(id);
+}
 #elif defined(__APPLE__)
 /* Resources:
  *  http://stackoverflow.com/questions/2919629/mac-os-x-linker-error-in-qt-coregraphics-cgwindowlistcreate
@@ -28,6 +33,9 @@ bool WindowUtils::isValid(WId id)
 */
 //#include </System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/CGWindow.h>
 #include <ApplicationServices/ApplicationServices.h>
+#include <QPixmap>
+#include <QApplication>
+#include <QDesktopWidget>
 // the following function was indirectly taken from src/corelib/kernel/qcore_mac.cpp
 QString toQString(CFStringRef str)
 {
@@ -112,12 +120,15 @@ QRect WindowUtils::windowGeometry(WId id)
     CFRelease(idArray);
     return result;
 }
+QPixmap WindowUtils::grabWindow(WId id)
+{
+    QRect r = windowGeometry(id);
+    WId d = QApplication::desktop()->winId();
+    return QPixmap::grabWindow(d, r.x(), r.y(), r.width(), r.height());
+}
 #else
 #error "Operating system not supported."
 #endif
-
-
-
 
 
 

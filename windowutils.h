@@ -8,6 +8,7 @@ namespace WindowUtils
     QString windowTitle(WId);
     bool isValid(WId);
     QRect windowGeometry(WId);
+    QPixmap grabWindow(WId);
 }
 
 #endif // WINDOWUTILS_H
