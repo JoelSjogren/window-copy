@@ -24,7 +24,7 @@ void WindowContentCopy::paintEvent(QPaintEvent *event)
     }
     QPainter painter(this);
     QPixmap windowPixmap = WindowUtils::grabWindow(targetWindow());
-    qDebug() << windowPixmap.size() << "for target window" << targetWindow();
+    //qDebug() << windowPixmap.size() << "for target window" << targetWindow();
     painter.drawPixmap(QPoint(), windowPixmap);
     event->accept();
 }
